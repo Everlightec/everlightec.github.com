@@ -74,7 +74,7 @@
 		});
 		
 		function get_weather_now(){
-			var apiURI = "http://api.openweathermap.org/data/2.5/weather?lat="+v_latitude+"&lon="+v_longitude+"&appid="+w_api_key"&lang=kr";
+			var apiURI = "http://api.openweathermap.org/data/2.5/weather?lat="+v_latitude+"&lon="+v_longitude+"&appid="+w_api_key+"&lang=kr";
 			$.ajax({
 				url: apiURI,
 				dataType: "json",
@@ -87,7 +87,7 @@
 		}
 
 		function get_weather_forecast(){
-			var apiURI = "http://api.openweathermap.org/data/2.5/forecast?lat="+v_latitude+"&lon="+v_longitude+"&appid="+w_api_key"&lang=kr";
+			var apiURI = "http://api.openweathermap.org/data/2.5/forecast?lat="+v_latitude+"&lon="+v_longitude+"&appid="+w_api_key+"&lang=kr";
 			$.ajax({
 				url: apiURI,
 				dataType: "json",
