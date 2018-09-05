@@ -31,15 +31,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 	<script>
-		var v_latitude;
-		var v_longitude;
+		var v_latitude = null;
+		var v_longitude = null;
 		var w_api_key = "da4ad192da16982700351ecb509cf629";
 		var a_api_key = "3c6f4cbec9cebe5060e4ad9b9cf8ec215b172340";
+		
 
 		var setCookie = function(name, value, exp) {
 		  var date = new Date();
 		  date.setTime(date.getTime() + exp*365*24*60*60*1000);
-		  document.cookie = namae + '=' + value + ';expires=' + date.toUTCString() + ';path=/';
+		  document.cookie = name + '=' + value + ';expires=' + date.toUTCString() + ';path=/';
 		};
 
 		var getCookie = function(name) {
@@ -47,22 +48,68 @@
 		  return value? value[2] : null;
 		};
 
-        if (navigator.geolocation) {
-            //위치 정보를 얻기
-            navigator.geolocation.getCurrentPosition (function(pos) {
+		$(function() {        
+			// Geolocation API에 액세스할 수 있는지를 확인
+			if (navigator.geolocation) {
+				//위치 정보를 얻기
+				navigator.geolocation.getCurrentPosition (function(pos) {
 				v_latitude = pos.coords.latitude // 위도
 				v_longitude = pos.coords.latitude // 경도
 				setCookie('latitude',v_latitude, 100);
 				setCookie('longitude',v_longitude, 100);
-            });
-        } else {
-			//위치정보를 가져오지 못할경우는  쿠키를 통해 가져온다.
-			//쿠키도 없을 경우 그냥 임의 위치를 사용한다.
-            v_latitude = getCookie('latitude');
-            v_longitude = getCookie('v_longitude');
-        } 
+				});
+			} else {
+				//위치정보를 가져오지 못할경우는  쿠키를 통해 가져온다.
+				//쿠키도 없을 경우 그냥 임의 위치를 사용한다(청와대).
+				v_latitude = getCookie('latitude');
+				v_longitude = getCookie('v_longitude');				 
+			}
+			if(!v_latitude)
+			{
+				v_latitude = "37.5866076";
+				v_longitude = "126.97481100000004";
+			}
+			get_weather_now();
+			get_weather_forecast();
+		});
 		
-		console.log(v_latitude);
+		function get_weather_now(){
+			var apiURI = "http://api.openweathermap.org/data/2.5/weather?lat="+v_latitude+"&lon="+v_longitude+"&appid="+w_api_key"&lang=kr";
+			$.ajax({
+				url: apiURI,
+				dataType: "json",
+				type: "GET",
+				cache: false,
+				success: function(resp) {  
+					console.log(resp)
+				}
+			})		
+		}
+
+		function get_weather_forecast(){
+			var apiURI = "http://api.openweathermap.org/data/2.5/forecast?lat="+v_latitude+"&lon="+v_longitude+"&appid="+w_api_key"&lang=kr";
+			$.ajax({
+				url: apiURI,
+				dataType: "json",
+				type: "GET",
+				cache: false,
+				success: function(resp) {  
+					console.log(resp)
+				}
+			})		
+		}
+
+		function get_air_quality(){
+			var apiURI = "http://api.openweathermap.org/data/2.5/weather?q="+city+"&appid="+w_api_key;
+			$.ajax({
+				url: apiURI,
+				dataType: "json",
+				type: "GET",
+				cache: false,
+				success: function(resp) {  
+				}
+			})		
+		}
 
 	</script>
   </body>
