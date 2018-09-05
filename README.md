@@ -1,2 +1,0 @@
-# everlightec.github.com
-Everlightec 
