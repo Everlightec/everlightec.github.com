@@ -8,35 +8,155 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
+	<!-- Weather icon CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.9/css/weather-icons.min.css" >
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.9/css/weather-icons-wind.min.css" >
+
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+
+
+
+	<style>
+		html, body {
+			height: 100%;
+		}
+
+		.container{
+			color:#878787;
+		}
+
+		.fill { 
+			min-height: 100%;
+			height: 100%;
+		}
+
+		 html {
+		  font-size: 1rem;
+		  color:#878787;
+		}
+
+		#div_weather_row {
+			height : 100vh;
+		}
+ 
+		#sp_weather_temp_now{
+			font-size:2rem;
+			text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+		}
+
+		#sp_weather_temp_now_Celsius{
+			vertical-align: 1rem;
+		}
+
+		#div_air_quality_now {
+ 		  width: 70%;
+		  margin:auto;
+		}
+ 
+
+		@include media-breakpoint-up(sm) {
+		  html {
+			font-size: 1.2rem;
+		  }
+		}
+
+		@include media-breakpoint-up(md) {
+		  html {
+			font-size: 1.4rem;
+		  }
+		}
+
+		@include media-breakpoint-up(lg) {
+		  html {
+			font-size: 1.6rem;
+		  }
+		}
+	</style>
+
     <title>Weather</title>
   </head>
   <body>
 	<div class="container">
 	  <div class="row">
 		<div class="col-sm">
-		  One of three columns
-		</div>
-		<div class="col-sm">
-		  One of three columns
-		</div>
-		<div class="col-sm">
-		  One of three columns
+			<div class="text-center mx-auto p-3">
+				<h2 id="div_city_name"></h2>
+			</div>
 		</div>
 	  </div>
-	</div>    
+	  <div class="row" id="div_weather_row">
+		<div class="col-sm">
+		  <div id="div_weather_now">
+			<div class="row">
+				<div class="col-sm">
+					<div id="div_weather_icon_holder" class="text-center"></div>
+					<div id="div_weather_name" class="text-center"></div>
+					<div id="div_weather_timestamp" class="text-center"></div>
+				</div>
+				<div class="col-sm">
+					<div id="div_weather_info_holder" >
+						<div><i class="wi wi-strong-wind" style="min-width:2rem;"></i>&nbsp;<span id="sp_wind_now"></span></div>
+						<div><i class="wi wi-humidity" style="min-width:2rem;color:#2196F3;"></i>&nbsp;<span id="sp_humidity_now"></span></div>
+						<div><i class="fas fa-arrow-up text-danger" style="min-width:2rem;"></i>&nbsp;</div>
+						<div><i class="fas fa-arrow-down text-primary" style="min-width:2rem;"></i>&nbsp;</div>
+					</div>
+				</div>
+			</div>
+		  </div>
+		</div>
+		<div class="col-sm">
+			<div id="div_air_quality_now">
+				<canvas id="aqi_chart" ></canvas>
+			</div>
+		</div>
+	  </div>
+	</div> 
+	
+	<div id="addr_modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="Modal" aria-hidden="true">
+	  <div class="modal-dialog" role="document">
+		<div class="modal-content">
+		  <div class="modal-header">
+			<h5 class="modal-title" id="exampleModalLongTitle">현재위치를 가져오거나 아래 창에서 주소를 검색하세요</h5>
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			  <span aria-hidden="true">&times;</span>
+			</button>
+		  </div>
+		  <div class="modal-body">
+			  <button type="button" class="btn btn-primary" onclick="get_geolocation();"><i class="fas fa-map-marker"></i> 현재위치</button>
+			  <button type="button" class="btn btn-primary" onclick="DaumPostcode();"><i class="far fa-map"></i> 주소검색</button>
+			  <div id="div_daum_post_code" style="display:none;position:fixed;overflow:hidden;z-index:1;-webkit-overflow-scrolling:touch;">
+				<img src="//t1.daumcdn.net/localimg/localimages/07/postcode/320/close.png" id="btnCloseLayer" style="cursor:pointer;position:absolute;right:-3px;top:-3px;z-index:1" onclick="closeDaumPostcode()" alt="닫기 버튼">
+			  </div>
+		  </div>
+		  <div class="modal-footer">
+			<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+		  </div>
 
+
+		</div>
+	  </div>
+	</div>
+ 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="  crossorigin="anonymous"></script> 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+	<!-- Daum map Api 주소 to 위경도 위해 사용 -->
+	<script src="http://dmaps.daum.net/map_js_init/postcode.v2.js"></script>
+	<script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=598238c1bf6ec26d457e92c6b9237965&libraries=services"></script>
+
+	<!-- Chart js -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
 	<script>
 		var v_latitude = null;
 		var v_longitude = null;
 		var w_api_key = "da4ad192da16982700351ecb509cf629";
 		var a_api_key = "3c6f4cbec9cebe5060e4ad9b9cf8ec215b172340";
-		
+		var geocoder = new daum.maps.services.Geocoder();
 
+		var element_layer = document.getElementById('div_daum_post_code');
 		var setCookie = function(name, value, exp) {
 		  var date = new Date();
 		  date.setTime(date.getTime() + exp*365*24*60*60*1000);
@@ -47,9 +167,16 @@
 		  var value = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
 		  return value? value[2] : null;
 		};
+		var ctx = document.getElementById("aqi_chart");
+
+
 
 		$(function() {        
 			// Geolocation API에 액세스할 수 있는지를 확인
+			v_latitude = getCookie('latitude');
+			v_longitude = getCookie('longitude');		
+			
+			/*
 			if (navigator.geolocation) {
 				//위치 정보를 얻기
 				navigator.geolocation.getCurrentPosition (function(pos) {
@@ -62,19 +189,265 @@
 				//위치정보를 가져오지 못할경우는  쿠키를 통해 가져온다.
 				//쿠키도 없을 경우 그냥 임의 위치를 사용한다(청와대).
 				v_latitude = getCookie('latitude');
-				v_longitude = getCookie('v_longitude');				 
+				v_longitude = getCookie('longitude');				 
 			}
+			*/
 			if(!v_latitude)
 			{
-				v_latitude = "37.5866076";
-				v_longitude = "126.97481100000004";
+				$('#addr_modal').modal('show')
+				//v_latitude = "37.5866076";
+				//v_longitude = "126.97481100000004";
+				return;
 			}
-			get_weather_now();
-			get_weather_forecast();
+			setTimeout(get_info_now,500);
+			$('#addr_modal').on('shown.bs.modal', function (e) {
+				//DaumPostcode();
+			})
+			
+/*
+{
+        "type": "doughnut",
+        "data": {
+            "datasets": [
+                {
+                    "data": [
+                        30,
+                        30,
+                        20,
+                        1,
+                        20
+                    ],
+                    "backgroundColor": [
+                        "rgb(255, 69, 96)",
+                        "rgb(206, 148, 73)",
+                        "rgb(153, 223, 89)",
+                        "rgba(0, 0, 0, 0.6)",
+                        "rgb(153, 223, 89)"
+                    ],
+                    "borderWidth": 0,
+                    "hoverBackgroundColor": [
+                        "rgb(255, 69, 96)",
+                        "rgb(206, 148, 73)",
+                        "rgb(153, 223, 89)",
+                        "rgba(0, 0, 0, 0.6)",
+                        "rgb(153, 223, 89)"
+                    ],
+                    "hoverBorderWidth": 0
+                },
+                {
+                    "data": [
+                        30,
+                        30,
+                        20,
+                        1,
+                        20
+                    ],
+                    "backgroundColor": [
+                        "rgba(0, 0, 0, 0)",
+                        "rgba(0, 0, 0, 0)",
+                        "rgba(0, 0, 0, 0)",
+                        "rgba(0, 0, 0, 0.6)",
+                        "rgba(0, 0, 0, 0)"
+                    ],
+                    "borderWidth": 0,
+                    "hoverBackgroundColor": [
+                        "rgba(0, 0, 0, 0)",
+                        "rgba(0, 0, 0, 0)",
+                        "rgba(0, 0, 0, 0)",
+                        "rgba(0, 0, 0, 0.6)",
+                        "rgba(0, 0, 0, 0)"
+                    ],
+                    "hoverBorderWidth": 0
+                }
+            ]
+        },
+        "options": {
+            "cutoutPercentage": 0,
+            "rotation": -3.1415926535898,
+            "circumference": 3.1415926535898,
+            "legend": {
+                "display": false
+            },
+            "tooltips": {
+                "enabled": false
+            },
+            "title": {
+                "display": true,
+                "text": 4,
+                "position": "bottom"
+            }
+        }
+    }
+*/
+
+
+			var myDoughnutChart = new Chart(ctx, {
+				type: 'doughnut',
+				data: {
+					labels: ["좋음", "보통", "민감군영향", "나쁨", "매우나쁨", "위험"],
+					datasets: [{
+						label: '# 대기지수',
+						data: [50, 50, 50, 50, 100, 300],
+						backgroundColor: [
+							'#009966',
+							'#FFDE33',
+							'#FF9933',
+							'#CC0033',
+							'#660099',
+							'#7E0023'
+						],
+						borderColor: [
+							'#009966',
+							'#FFDE33',
+							'#FF9933',
+							'#CC0033',
+							'#660099',
+							'#7E0023'
+						],
+						borderWidth: 1
+					}]
+				},
+				options: {
+				  circumference: 1 * Math.PI,
+				  rotation: 1 * Math.PI,
+				  cutoutPercentage: 70,
+				  legend: {
+					display: false
+				  },
+			      maintainAspectRatio :false,
+				  animation: {
+								onComplete: function () {
+										drawNeedle(100, 35);
+								}
+				  }
+				}
+			});
 		});
 		
+		function percent_to_degree(v_value){
+			var result = 0;
+			if(v_value * 3.6 == 0) {
+				result = 0;
+			}
+			else{
+				result = v_value * 3.6;
+			}
+			console.log(v_value)
+			console.log(result)
+			return result;
+		}
+
+		function percent_to_radian(v_value){
+			var result = 0;
+			if(v_value * 0.062831853071796 == 0) {
+				result = 0;
+			}
+			else{
+				result = v_value * 0.062831853071796;
+			}
+			return result ;
+		}
+ 
+ 
+		function drawNeedle(radius, aqi) {
+			var canvas = document.getElementById("aqi_chart");
+			var catx = canvas.getContext('2d');
+			var cw = canvas.offsetWidth;
+			var ch = canvas.offsetHeight;
+			var cx = cw / 2;
+			var cy = ch - (ch / 20);
+			var p_val = (aqi / 600) * 100;
+			var radianAngle = percent_to_degree(p_val);
+			var radianAngle = (radianAngle * -1) * Math.PI / 180;
+			console.log(radianAngle);
+ 			catx.translate(cx, cy);
+			catx.rotate(radianAngle);
+			catx.beginPath();
+			catx.moveTo(0, -5);
+			catx.lineTo(radius, 0);
+			catx.lineTo(0, 5);
+			catx.fillStyle = 'rgba(0, 76, 0, 0.8)';
+			catx.fill();
+			catx.rotate(-radianAngle);
+			catx.translate(-cx, -cy);
+			catx.beginPath();
+			catx.arc(cx, cy, 7, 0, Math.PI * 2);
+			catx.fill();
+		}
+
+
+
+		function get_info_now(){
+			if(!v_latitude)
+			{
+				console.log('위치정보 갱신 실패.1분뒤 재시도');
+				setTimeout(get_info_now, 60000);
+				return false;
+			}
+			get_city_info(v_longitude,v_latitude);
+			get_weather_now();
+			get_weather_forecast_hourly_5days();
+			get_air_quality();
+			
+			setTimeout(get_info_now, 60000 * 60);
+		}
+		
+		function callback_city_info(result, status){
+				if (status === daum.maps.services.Status.OK) {
+					$("#div_city_name").html(result[0].address_name)
+				} 
+		}
+
+		function get_city_info(Lng,Lat){
+			geocoder.coord2RegionCode(Lng, Lat, callback_city_info);
+			//법정명 가져오기
+		}
+		
+
+
 		function get_weather_now(){
-			var apiURI = "http://api.openweathermap.org/data/2.5/weather?lat="+v_latitude+"&lon="+v_longitude+"&appid="+w_api_key+"&lang=kr";
+			var apiURI = "http://api.openweathermap.org/data/2.5/weather?lat="+v_latitude+"&lon="+v_longitude+"&appid="+w_api_key+"&lang=kr&units=metric";
+			$.ajax({
+				url: apiURI,
+				dataType: "json",
+				type: "GET",
+				cache: false,
+				success: function(resp) {  
+					console.log(resp);
+					$("#div_weather_icon_holder").fadeOut(500, function() {
+					   $(this).empty().show();
+					});
+				    var code = resp.weather[0].id;
+					var time_now = new Date(resp.dt*1000); 
+					var sunrise = new Date(resp.sys.sunrise*1000); 
+					var sunset = new Date(resp.sys.sunset*1000); 
+					var day_night = "";
+					if(time_now.getHours() >= sunrise.getHours() && time_now.getHours() < sunset.getHours()) 
+					{
+						day_night = "day-"
+					}
+					else
+					{
+						day_night = "night-"
+					}
+					var icond = "wi wi-owm-" + day_night+ code;	
+					//var fs = $("#div_weather_icon_holder").width() * 0.8;
+
+					$("#div_weather_icon_holder").fadeIn(500, function() {
+					   $(this).html("<i class=\""+icond+"\" style='font-size:400%;'></i><span id=\"sp_weather_temp_now\" style=\"color:#"+get_temperature_color(resp.main.temp)+";padding-left:1rem;\">"+resp.main.temp.toFixed(0)+"</span><span id=\"sp_weather_temp_now_Celsius\">℃ </span>").show();
+					});
+					$("#div_weather_name").html("").html(get_weather_id_to_kor(resp.weather[0].id+""));
+					$("#div_weather_timestamp").html("").html(convert_timestamp_to_string(time_now) +" 기준");
+					$("#sp_wind_now").html("").html("<i class=\"wi wi-wind from-"+resp.wind.deg+"-deg\"></i>"+"&nbsp;"+resp.wind.speed+"m/s");
+					$("#sp_humidity_now").html("").html(resp.main.humidity);
+
+					//$("#div_weather_temp_min_max").html("").html("<p>"+resp.main.temp_max.toFixed(0)+"</p><p>"+resp.main.temp_min.toFixed(0)+"</p>");
+				}
+			})		
+		}
+
+		function get_weather_forecast_hourly_5days(){
+			var apiURI = "http://api.openweathermap.org/data/2.5/forecast?lat="+v_latitude+"&lon="+v_longitude+"&appid="+w_api_key+"&lang=kr&units=metric";
 			$.ajax({
 				url: apiURI,
 				dataType: "json",
@@ -86,30 +459,376 @@
 			})		
 		}
 
-		function get_weather_forecast(){
-			var apiURI = "http://api.openweathermap.org/data/2.5/forecast?lat="+v_latitude+"&lon="+v_longitude+"&appid="+w_api_key+"&lang=kr";
-			$.ajax({
-				url: apiURI,
-				dataType: "json",
-				type: "GET",
-				cache: false,
-				success: function(resp) {  
-					console.log(resp)
-				}
-			})		
-		}
-
+ 
 		function get_air_quality(){
-			var apiURI = "http://api.openweathermap.org/data/2.5/weather?q="+city+"&appid="+w_api_key;
+
+
+			var apiURI = "https://api.waqi.info/feed/geo:"+v_latitude+";"+v_longitude+"/?token="+a_api_key;
 			$.ajax({
 				url: apiURI,
 				dataType: "json",
 				type: "GET",
 				cache: false,
 				success: function(resp) {  
+					console.log(resp)
+					if(resp.status != "ok")
+					{
+						get_air_quality();
+						return;
+					}
+					//$("#div_air_quality_now").html("").html("<div>대기지수:"+resp.data.aqi+"</div><div>미세먼지:"+resp.data.iaqi.pm10.v+"</div><div>초미세먼지:"+resp.data.iaqi.pm25.v+"</div>")
 				}
 			})		
 		}
+
+		function closeDaumPostcode() {
+			var modal_body = $("#addr_modal").find('.modal-body');
+			modal_body.css({
+				height : 'auto'
+			})
+			element_layer.style.display = 'none';			
+		}
+
+		function initLayerPosition(){
+			var width = 320; //우편번호서비스가 들어갈 element의 width
+			var height = 480; //우편번호서비스가 들어갈 element의 height
+			var borderWidth = 1; //border의 두께
+
+			// 위에서 선언한 값들을 실제 element에 넣는다.
+			element_layer.style.width = width + 'px';
+			element_layer.style.height = height + 'px';
+			element_layer.style.border = borderWidth + 'px solid';
+			// 실행되는 순간의 화면 너비와 높이 값을 가져와서 중앙에 뜰 수 있도록 위치를 계산한다.
+			//element_layer.style.left = (((window.innerWidth || document.documentElement.clientWidth) - width)/2 - borderWidth) + 'px';
+			//element_layer.style.top = (((window.innerHeight || document.documentElement.clientHeight) - height)/2 - borderWidth) + 'px';
+			var modal_body = $("#addr_modal").find('.modal-body');
+			modal_body.css({
+				height : modal_body.height()  + height + 50 + 'px'
+			})
+
+ 
+		}
+
+		function DaumPostcode() {
+			new daum.Postcode({
+				oncomplete: function(data) {
+					// 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+					geocoder.addressSearch(data.address, function(results, status) {
+						// 정상적으로 검색이 완료됐으면
+						if (status === daum.maps.services.Status.OK) {
+
+							var result = results[0]; //첫번째 결과의 값을 활용
+							v_latitude = result.y // 위도
+							v_longitude = result.x // 경도
+							setCookie('latitude',v_latitude, 100);
+							setCookie('longitude',v_longitude, 100);
+							// 해당 주소에 대한 좌표를 받는다.
+							//var coords = new daum.maps.LatLng(result.y, result.x);
+							if(!v_latitude)
+							{		
+								alert("위치정보가 없습니다.주소검색을 사용하세요");
+								return;
+							}
+							closeDaumPostcode();
+							$('#addr_modal').modal('hide');
+							get_info_now();
+						}
+						else{
+						
+						}
+					});
+					// iframe을 넣은 element를 안보이게 한다.
+					// (autoClose:false 기능을 이용한다면, 아래 코드를 제거해야 화면에서 사라지지 않는다.)
+					element_layer.style.display = 'none';
+				},
+				width : '100%',
+				height : '100%',
+				maxSuggestItems : 5
+			}).embed(element_layer);
+
+			// iframe을 넣은 element를 보이게 한다.
+			element_layer.style.display = 'block';
+
+			// iframe을 넣은 element의 위치를 화면의 가운데로 이동시킨다.
+			initLayerPosition();
+		}
+
+ 
+
+	  function get_geolocation(){
+			if (navigator.geolocation) {
+				//위치 정보를 얻기
+				navigator.geolocation.getCurrentPosition (function(pos) {
+					v_latitude = pos.coords.latitude // 위도
+					v_longitude = pos.coords.latitude // 경도
+					setCookie('latitude',v_latitude, 100);
+					setCookie('longitude',v_longitude, 100);
+					if(!v_latitude)
+					{		
+						alert("위치정보가 없습니다.주소검색을 사용하세요");
+						return;
+					}
+					get_info_now();
+					$('#addr_modal').modal('hide');
+				},function(pos_err){
+					alert("위치정보를 가져오는데 문제가 있습니다.주소검색을 사용하세요");
+					return;
+				}
+				);
+			} else {
+				alert("위치정보를 사용 할 수 없습니다.주소검색을 사용하세요");
+				return;
+			}
+	  }
+
+	  function get_weather_id_to_kor(v_id){
+		  var return_weather_kor = ""
+		  switch(v_id)
+		  {
+			case "200":
+				return_weather_kor = "천둥번개,비";
+				break;
+			case "201":
+				return_weather_kor = "천둥번개,비";
+				break;
+			case "202":
+				return_weather_kor = "천둥번개,비";
+				break;
+			case "210":
+				return_weather_kor = "천둥번개";
+				break;
+			case "211":
+				return_weather_kor = "천둥번개";
+				break;
+			case "212":
+				return_weather_kor = "천둥번개";
+				break;
+			case "221":
+				return_weather_kor = "간헐적 천둥번개";
+				break;
+			case "230":
+				return_weather_kor = "천둥번개,안개비";
+				break;
+			case "231":
+				return_weather_kor = "천둥번개,안개비";
+				break;
+			case "232":
+				return_weather_kor = "천둥번개,안개비";
+				break;
+			case "300":
+				return_weather_kor = "안개비";
+				break;
+			case "301":
+				return_weather_kor = "안개비";
+				break;
+			case "302":
+				return_weather_kor = "안개비";
+				break;
+			case "310":
+				return_weather_kor = "이슬비";
+				break;
+			case "311":
+				return_weather_kor = "이슬비";
+				break;
+			case "312":
+				return_weather_kor = "이슬비";
+				break;
+			case "313":
+				return_weather_kor = "소나기";
+				break;
+			case "314":
+				return_weather_kor = "소나기";
+				break;
+			case "321":
+				return_weather_kor = "소나기";
+				break;
+			case "500":
+				return_weather_kor = "약한비";
+				break;
+			case "501":
+				return_weather_kor = "비";
+				break;
+			case "502":
+				return_weather_kor = "강한비";
+				break;
+			case "503":
+				return_weather_kor = "호우";
+				break;
+			case "504":
+				return_weather_kor = "집중호우";
+				break;
+			case "511":
+				return_weather_kor = "우박";
+				break;
+			case "520":
+				return_weather_kor = "소나기";
+				break;
+			case "521":
+				return_weather_kor = "소나기";
+				break;
+			case "522":
+				return_weather_kor = "소나기";
+				break;
+			case "531":
+				return_weather_kor = "간헐적 소나기";
+				break;
+			case "600":
+				return_weather_kor = "눈";
+				break;
+			case "601":
+				return_weather_kor = "눈";
+				break;
+			case "602":
+				return_weather_kor = "폭설";
+				break;
+			case "611":
+				return_weather_kor = "진눈깨비";
+				break;
+			case "612":
+				return_weather_kor = "진눈깨비";
+				break;
+			case "615":
+				return_weather_kor = "진눈깨비";
+				break;
+			case "616":
+				return_weather_kor = "진눈깨비";
+				break;
+			case "620":
+				return_weather_kor = "눈";
+				break;
+			case "621":
+				return_weather_kor = "눈";
+				break;
+			case "622":
+				return_weather_kor = "폭설";
+				break;
+			case "701":
+				return_weather_kor = "박무";
+				break;
+			case "711":
+				return_weather_kor = "스모그";
+				break;
+			case "721":
+				return_weather_kor = "연무";
+				break;
+			case "731":
+				return_weather_kor = "모래바람";
+				break;
+			case "741":
+				return_weather_kor = "안개";
+				break;
+			case "751":
+				return_weather_kor = "모래";
+				break;
+			case "761":
+				return_weather_kor = "먼지";
+				break;
+			case "762":
+				return_weather_kor = "화산재";
+				break;
+			case "771":
+				return_weather_kor = "돌풍";
+				break;
+			case "781":
+				return_weather_kor = "토네이도";
+				break;
+			case "800":
+				return_weather_kor = "맑음";
+				break;
+			case "801":
+				return_weather_kor = "구름";
+				break;
+			case "802":
+				return_weather_kor = "구름";
+				break;
+			case "803":
+				return_weather_kor = "구름";
+				break;
+			case "804":
+				return_weather_kor = "흐림";
+				break;
+		  }
+		  return return_weather_kor;
+	  }
+
+	  function get_temperature_color(temp){
+		var rgb_code = "";
+		if(temp > 43.3){
+			rgb_code = "FDF0F0";
+		}else if(temp <= 43.3 && temp > 40.5){
+			rgb_code = "FAC8DC";
+		}else if(temp <= 40.5 && temp > 37.7){
+			rgb_code = "F0273C";
+		}else if(temp <= 37.7 && temp > 35){
+			rgb_code = "8C0101";
+		}else if(temp <= 35 && temp > 32.2){
+			rgb_code = "B42703";
+		}else if(temp <= 32.2 && temp > 29.4){
+			rgb_code = "DC5004";
+		}else if(temp <= 29.4 && temp > 26.6){
+			rgb_code = "F08C12";
+		}else if(temp <= 26.6 && temp > 23.8){
+			rgb_code = "F7B429";
+		}else if(temp <= 23.8 && temp > 21.1){
+			rgb_code = "F5DD5A";
+		}else if(temp <= 21.1 && temp > 18.3){
+			rgb_code = "F9F673";
+		}else if(temp <= 18.3 && temp > 15.5){
+			rgb_code = "FAFBA0";
+		}else if(temp <= 15.5 && temp > 12.7){
+			rgb_code = "B4FFB5";
+		}else if(temp <= 12.7 && temp > 10){
+			rgb_code = "8CFF8C";
+		}else if(temp <= 10 && temp > 7.2){
+			rgb_code = "64E764";
+		}else if(temp <= 7.2 && temp > 4.4){
+			rgb_code = "3EC805";
+		}else if(temp <= 4.4 && temp > 1.6){
+			rgb_code = "32A131";
+		}else if(temp <= 1.6 && temp > -1.1){
+			rgb_code = "217802";
+		}else if(temp <= -1.1 && temp > -3.8){
+			rgb_code = "96E7FE";
+		}else if(temp <= -3.8 && temp > -6.6){
+			rgb_code = "41B5FD";
+		}else if(temp <= -6.6 && temp > -9.4){
+			rgb_code = "338CF0";
+		}else if(temp <= -9.4 && temp > -12.2){
+			rgb_code = "233CFD";
+		}else if(temp <= -12.2 && temp > -15){
+			rgb_code = "1400C8";
+		}else if(temp <= -15 && temp > -17.7){
+			rgb_code = "0C0096";
+		}else if(temp <= -17.7 && temp > -20.5){
+			rgb_code = "8C01AF";
+		}else if(temp <= -20.5 && temp > -23.3){
+			rgb_code = "B164C0";
+		}else if(temp <= -20.3 && temp > -26.1){
+			rgb_code = "E104E2";
+		}else if(temp <= -26.1 && temp > -28.8){
+			rgb_code = "F664FD";
+		}else if(temp <= -28.8 && temp > -31.6){
+			rgb_code = "FAC8FE";
+		}else if(temp <= -31.6 && temp > -34.4){
+			rgb_code = "FDE6FF";
+		}else if(temp <= -34.4 && temp > -37.2){
+			rgb_code = "FFFFFF";
+		}else if(temp <= -37.2 && temp > -40){
+			rgb_code = "CCCCCD";
+		}else if(temp < -40){
+			rgb_code = "818281";
+		}
+		return rgb_code;
+	  }
+
+
+	  function pad2(n) { 
+		return n < 10 ? '0' + n : n 
+	  }
+
+	  function convert_timestamp_to_string(v_date){
+		return v_date.getFullYear().toString() + "-" + pad2(v_date.getMonth() + 1) + "-" + pad2( v_date.getDate()) + " "+ pad2( v_date.getHours() ) + ":" + pad2( v_date.getMinutes() ) + ":" + pad2( v_date.getSeconds() )
+	  }
 
 	</script>
   </body>
